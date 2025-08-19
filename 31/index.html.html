@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RobuStore — Robux Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Светлая бело‑голубая тема */
+  --bg:#f6f9ff;            /* фон страницы */
+  --panel:#ffffff;         /* панели/дроверы */
+  --card:#ffffff;          /* карточки/блоки */
+  --stroke:#dbe6ff;        /* границы */
+  --text:#0b1b3a;          /* основной текст */
+  --muted:#5c6f95;         /* вторичный */
+  --blue:#2b7cff;          /* синий акцент */
+  --blue-2:#2168e1;        /* hover */
+  --green:#11c06d;         /* подтверждения */
+  --pink:#ff5fa6;          /* скидки */
+  --yellow:#ffd744;        /* подарок */
+  --radius:14px;
+  --shadow:0 10px 30px rgba(43,124,255,.08);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px}
+
+/* Header */
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.75);backdrop-filter:blur(10px);border-bottom:1px solid var(--stroke)}
+.top{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{background:var(--blue);color:#fff;font-weight:900;border-radius:10px;padding:6px 10px;letter-spacing:.4px}
+.brand .muted{color:var(--muted)}
+.nav{display:flex;align-items:center;gap:8px}
+.btn{appearance:none;border:1px solid var(--stroke);background:#f2f6ff;color:var(--text);border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;transition:.15s}
+.btn.primary{background:var(--blue);border-color:transparent;color:#fff;box-shadow:var(--shadow)}
+.btn.primary:hover{background:var(--blue-2);transform:translateY(-1px)}
+.btn.ghost{background:transparent}
+.badge-pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--stroke);border-radius:999px;padding:8px 12px;background:#fff}
+.count{background:var(--blue);color:#fff;border-radius:999px;padding:2px 8px;font-weight:900}
+
+/* Banner */
+.banner{margin:16px 0;border:1px solid var(--stroke);border-radius:18px;min-height:180px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#eaf1ff url('') center/cover no-repeat;box-shadow:var(--shadow)}
+.banner .in{padding:22px;text-align:center}
+.banner h1{margin:0;font-size:28px;color:#0b1b3a}
+.banner p{margin:6px 0 0;color:var(--muted)}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin:22px 0 60px}
+.col-3{grid-column:span 3}
+@media(max-width:1100px){.col-3{grid-column:span 4}}
+@media(max-width:760px){.col-3{grid-column:span 6}}
+@media(max-width:520px){.col-3{grid-column:span 12}}
+
+.card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);overflow:hidden;position:relative;box-shadow:var(--shadow)}
+.pic{aspect-ratio:1/1;background:#eaf1ff url('') center/cover no-repeat}
+.cnt{padding:14px}
+.titlebar{display:flex;align-items:center;justify-content:space-between}
+.price{font-weight:900}
+.s{font-size:12px}
+.muted{color:var(--muted)}
+.badge{position:absolute;top:8px;left:8px;background:#fff;border:1px solid var(--stroke);border-radius:999px;padding:6px 10px;font-weight:800;box-shadow:var(--shadow)}
+.discount{position:absolute;bottom:8px;left:8px;background:var(--pink);color:#fff;padding:4px 8px;border-radius:8px;font-weight:900}
+.gift{position:absolute;top:8px;right:8px;background:var(--yellow);color:#140f00;padding:4px 10px;border-radius:999px;font-weight:900}
+.add{margin-top:10px;width:100%}
+
+/* Reviews (как на скрине) */
+.reviews{display:grid;grid-template-columns:1fr 360px;gap:18px}
+@media(max-width:980px){.reviews{grid-template-columns:1fr}}
+.rev-list{display:grid;gap:14px}
+.rev-card{background:#fff;border:1px solid var(--stroke);border-radius:16px;box-shadow:var(--shadow);padding:14px}
+.rev-head{display:flex;justify-content:space-between;align-items:center}
+.rev-user{display:flex;gap:10px;align-items:center}
+.rev-ava{width:42px;height:42px;border-radius:50%;background:#eaf1ff;display:grid;place-items:center;font-weight:900;color:#2b7cff}
+.rev-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tag{display:flex;gap:6px;align-items:center;background:#f2f7ff;border:1px solid var(--stroke);color:#1b3b7a;border-radius:999px;padding:6px 10px;font-size:12px}
+.stars{color:#ffb400}
+.rev-side{position:sticky;top:86px;height:fit-content}
+.rev-box{background:#fff;border:1px solid var(--stroke);border-radius:16px;box-shadow:var(--shadow);padding:14px}
+
+/* Drawers (cart/cabinet/admin) */
+.drawer{position:fixed;inset:0;display:none}
+.drawer.open{display:block}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.panel{position:absolute;top:0;bottom:0;right:0;width:min(560px,100%);background:var(--panel);border-left:1px solid var(--stroke);overflow:auto;padding:18px 16px 100px}
+.panel h3{margin:6px 0 12px}
+.hr{height:1px;background:var(--stroke);margin:14px 0}
+.item{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--stroke);border-radius:12px;padding:10px;margin:8px 0;background:#fff}
+.qty{display:flex;gap:8px;align-items:center}
+.btn.xs{padding:6px 10px;border-radius:8px}
+
+/* Cabinet Layout */
+.cab{display:grid;grid-template-columns:260px 1fr;gap:16px}
+@media(max-width:900px){.cab{grid-template-columns:1fr}}
+.side{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.user{display:flex;gap:12px;align-items:center}
+.ava{position:relative;width:46px;height:46px;border-radius:12px;background:#eaf1ff;display:grid;place-items:center;font-weight:900;color:#2b7cff}
+.ava.support{background:#eafff4;color:#0e8f53}
+.badge-check{position:absolute;right:-4px;bottom:-4px;background:#fff;border:1px solid var(--stroke);border-radius:999px;padding:2px 4px;font-size:12px}
+.menu{display:grid;gap:8px;margin-top:12px}
+.mitem{display:flex;align-items:center;gap:8px;border:1px solid var(--stroke);border-radius:12px;padding:10px;background:#fff;cursor:pointer;box-shadow:var(--shadow)}
+.mitem.active,.mitem:hover{border-color:var(--blue)}
+.main{display:grid;gap:16px}
+.block{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+
+/* Stats & tables */
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:#fff;border:1px solid var(--stroke);border-radius:12px;padding:12px}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--stroke);border-radius:12px;overflow:hidden}
+th,td{padding:10px;border-bottom:1px solid var(--stroke);text-align:left;font-size:14px}
+.status{display:inline-flex;gap:6px;align-items:center;padding:4px 8px;border-radius:999px}
+.s-pend{background:#fff3f8;color:#c21e6a}
+.s-done{background:#eafff4;color:#0f8b54}
+.s-cancel{background:#fff8e1;color:#906b00}
+
+/* Chat */
+.chat{display:grid;grid-template-rows:1fr auto;min-height:380px;border:1px solid var(--stroke);border-radius:12px;background:#fff}
+.chat .log{padding:10px;overflow:auto;max-height:420px}
+.msg{display:flex;gap:8px;margin:8px 0;max-width:80%}
+.msg .bubble{padding:10px;border-radius:12px;border:1px solid var(--stroke);background:#f7fbff}
+.msg.user{margin-left:auto;flex-direction:row-reverse}
+.msg.user .bubble{background:#e3f1ff;border-color:#cde3ff}
+.msg.support .bubble{background:#eefaf5;border-color:#d4f1e4}
+.msg .avatar{width:36px;height:36px;border-radius:10px;background:#eaf1ff;display:grid;place-items:center;font-weight:900;color:#2b7cff}
+.msg .avatar.support{background:#eafff4;color:#0f8b54;position:relative}
+.msg .avatar.support::after{content:'✔︎';position:absolute;right:-5px;bottom:-5px;background:#fff;border:1px solid var(--stroke);border-radius:999px;font-size:11px;padding:1px 4px}
+
+/* Admin specific */
+.adm .tabs{display:flex;gap:8px;margin:6px 0 12px;flex-wrap:wrap}
+.adm .tab{padding:8px 12px;border:1px solid var(--stroke);border-radius:10px;cursor:pointer;background:#fff}
+.adm .tab.active{background:var(--blue);color:#fff;border-color:transparent;font-weight:900}
+
+/* Inputs */
+input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid var(--stroke);color:var(--text);outline:none}
+.radio-row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:flex;gap:8px;align-items:center;border:1px solid var(--stroke);border-radius:999px;padding:8px 12px;background:#fff}
+.requisites{background:#f7fbff;border:1px dashed var(--stroke);border-radius:12px;padding:10px}
+.notice{background:#eef8ff;border:1px solid #cfe3ff;border-radius:12px;padding:10px;color:#214a94}
+
+footer{border-top:1px solid var(--stroke);padding:18px 0;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div class="brand">
+      <div class="logo" id="logo">RobuStore</div>
+      <div class="muted">🎮 Магазин Robux • бело‑голубой стиль</div>
+    </div>
+    <div class="nav">
+      <a class="btn ghost" href="#home">🏠 Главная</a>
+      <a class="btn ghost" href="#cabinet">👤 Кабинет</a>
+      <span class="badge-pill" id="openCart" role="button">🛒 Корзина <span class="count" id="cartCount">0</span></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- Banner -->
+  <section class="banner" id="banner">
+    <div class="in">
+      <h1 id="bannerTitle">RobuStore — выгодный Robux</h1>
+      <p id="bannerSubtitle">Быстро • Надёжно • Без посредников</p>
+    </div>
+  </section>
+
+  <!-- Catalog -->
+  <section id="catalog">
+    <h2 style="margin:8px 0 6px">🛍️ Купить Robux</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- Reviews -->
+  <section id="reviews" class="wrap" style="margin-bottom:70px">
+    <h2 style="margin:8px 0 6px">⭐ Отзывы</h2>
+    <div class="reviews">
+      <div class="rev-list" id="revList"></div>
+      <aside class="rev-side">
+        <div class="rev-box">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div class="muted s">Средняя оценка</div><div style="font-size:28px;font-weight:900" id="revAvg">0.0</div></div>
+            <div style="text-align:right"><div class="muted s">Всего</div><div style="font-weight:900" id="revCount">0</div></div>
+          </div>
+          <div class="hr"></div>
+          <div class="muted s">Рейтинг по звёздам</div>
+          <div id="revStarsBreak" class="s" style="margin-top:6px;color:#0b1b3a"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<!-- Cart / Checkout -->
+<div class="drawer" id="cartDr">
+  <div class="scrim" onclick="UI.closeCart()"></div>
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>🛒 Корзина</h3>
+      <button class="btn" onclick="UI.closeCart()">Закрыть</button>
+    </div>
+    <div id="cartItems"></div>
+    <div class="hr"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="muted">Итого</div>
+      <div class="price" id="cartTotal">0 ₽</div>
+    </div>
+    <div class="hr"></div>
+
+    <div id="payBlock">
+      <div class="adm tabs">
+        <div class="tab active" data-paytab="frombalance">💳 С баланса</div>
+        <div class="tab" data-paytab="manual">🏦 СБП / 🪙 USDT</div>
+      </div>
+
+      <!-- Pay from balance -->
+      <div id="pay_frombalance">
+        <p class="muted s">Доступно: <b id="cabBalanceInline">0 ₽</b></p>
+        <button class="btn primary" onclick="UI.payFromBalance()">Оплатить с баланса</button>
+      </div>
+
+      <!-- Manual pay -->
+      <div id="pay_manual" style="display:none">
+        <label>📧 Ваш ник/почта
+          <input id="ck_name" placeholder="@ник или email">
+        </label>
+        <div class="hr"></div>
+        <div class="muted">Выберите способ</div>
+        <div class="radio-row" style="margin:6px 0 8px">
+          <label class="chip"><input type="radio" name="pm" value="SBP" checked> 🏦 СБП</label>
+          <label class="chip"><input type="radio" name="pm" value="USDT"> 🪙 USDT (TRC20)</label>
+        </div>
+        <div class="requisites" id="requisitesBox"></div>
+        <div style="margin-top:8px">
+          <div class="muted s">📷 Скриншот оплаты</div>
+          <input type="file" id="ck_file" accept="image/*">
+        </div>
+        <div class="hr"></div>
+        <button class="btn primary" onclick="UI.submitOrder()">Отправить на обработку</button>
+        <div class="notice" id="ck_done" style="display:none;margin-top:8px">Заявка создана. Статус: «На обработке»</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cabinet -->
+<div class="drawer" id="cabDr">
+  <div class="scrim" onclick="Cab.close()"></div>
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>👤 Личный кабинет</h3>
+      <button class="btn" onclick="Cab.close()">Закрыть</button>
+    </div>
+
+    <div class="cab">
+      <!-- Sidebar -->
+      <aside class="side">
+        <div class="user">
+          <div class="ava" id="uAva">U</div>
+          <div>
+            <div id="uName"><b>Гость</b></div>
+            <div class="s muted">ID в браузере</div>
+          </div>
+        </div>
+        <div class="menu">
+          <div class="mitem active" data-ctab="overview">📊 Обзор</div>
+          <div class="mitem" data-ctab="orders">🛒 Покупки</div>
+          <div class="mitem" data-ctab="topups">💳 Пополнения</div>
+          <div class="mitem" data-ctab="chat">💬 Чат</div>
+          <div class="mitem" data-ctab="settings">⚙️ Настройки</div>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <section class="main">
+        <!-- Overview -->
+        <div class="block cabview" id="c_overview">
+          <div class="stat">
+            <div class="tile">
+              <div class="s muted">Баланс</div>
+              <div style="font-weight:900;font-size:20px" id="balanceVal">0 ₽</div>
+            </div>
+            <div class="tile">
+              <div class="s muted">Заказы</div>
+              <div style="font-weight:900;font-size:20px" id="ordersCount">0</div>
+            </div>
+            <div class="tile">
+              <div class="s muted">Пополнения</div>
+              <div style="font-weight:900;font-size:20px" id="topupsCount">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders -->
+        <div class="block cabview" id="c_orders" style="display:none">
+          <b>🛒 Покупки</b>
+          <table id="ordersTable">
+            <thead><tr><th>#</th><th>Дата</th><th>Состав</th><th>Сумма</th><th>Метод</th><th>Статус</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- Topups -->
+        <div class="block cabview" id="c_topups" style="display:none">
+          <div class="adm tabs">
+            <div class="tab active" data-topupt="new">➕ Пополнить</div>
+            <div class="tab" data-topupt="hist">📜 История</div>
+          </div>
+
+          <div id="topup_new">
+            <label>💵 Сумма, ₽
+              <input id="tp_amount" type="number" min="100" value="500">
+            </label>
+            <div class="hr"></div>
+            <div class="muted">Способ оплаты</div>
+            <div class="radio-row" style="margin:6px 0 8px">
+              <label class="chip"><input type="radio" name="tp_pm" value="SBP" checked> 🏦 СБП</label>
+              <label class="chip"><input type="radio" name="tp_pm" value="USDT"> 🪙 USDT (TRC20)</label>
+            </div>
+            <div class="requisites" id="tp_req"></div>
+            <div style="margin-top:8px">
+              <div class="s muted">📷 Скриншот</div>
+              <input type="file" id="tp_file" accept="image/*">
+            </div>
+            <div class="hr"></div>
+            <button class="btn primary" onclick="Cab.submitTopup()">Отправить на обработку</button>
+            <div class="notice" id="tp_done" style="display:none;margin-top:8px">Заявка создана. Админ зачислит после проверки.</div>
+          </div>
+
+          <div id="topup_hist" style="display:none">
+            <table id="topupsTable">
+              <thead><tr><th>#</th><th>Дата</th><th>Сумма</th><th>Метод</th><th>Статус</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Chat -->
+        <div class="block cabview" id="c_chat" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div class="ava support">S<span class="badge-check">✅</span></div>
+            <div><b>Поддержка RobuStore</b><div class="s muted">Обычно отвечает быстро</div></div>
+          </div>
+          <div class="chat">
+            <div class="log" id="chatLog"></div>
+            <div style="display:flex;gap:8px;padding:10px;border-top:1px solid var(--stroke)">
+              <input id="chatInput" placeholder="Напишите сообщение...">
+              <button class="btn primary" onclick="Chat.send()">Отправить</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="block cabview" id="c_settings" style="display:none">
+          <label>📧 Ник/почта
+            <input id="prof_name" placeholder="@ник или email">
+          </label>
+          <div class="hr"></div>
+          <button class="btn primary" onclick="Cab.saveProfile()">Сохранить</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Admin -->
+<div class="drawer" id="admDr">
+  <div class="scrim" onclick="Admin.close()"></div>
+  <div class="panel adm">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>🛠️ Админка</h3>
+      <button class="btn" onclick="Admin.close()">Закрыть</button>
+    </div>
+    <div id="admLogin">
+      <label>🔐 Пароль <input id="admPass" type="password" placeholder="Введите пароль"></label>
+      <div class="hr"></div><button class="btn primary" onclick="Admin.login()">Войти</button>
+      <div class="s muted" style="margin-top:6px">По умолчанию: <b>root</b></div>
+    </div>
+
+    <div id="admApp" style="display:none">
+      <div class="tabs">
+        <div class="tab active" data-atab="goods">📦 Товары</div>
+        <div class="tab" data-atab="orders">🧾 Заказы</div>
+        <div class="tab" data-atab="topups">💳 Пополнения</div>
+        <div class="tab" data-atab="chat">💬 Чат</div>
+        <div class="tab" data-atab="reviews">⭐ Отзывы</div>
+        <div class="tab" data-atab="look">🎨 Стиль/Баннер</div>
+        <div class="tab" data-atab="pay">🏦 Реквизиты</div>
+        <div class="tab" data-atab="sec">🔐 Безопасность</div>
+      </div>
+
+      <!-- Goods -->
+      <div id="a_goods">
+        <button class="btn primary" onclick="Admin.addProduct()">+ Товар</button>
+        <div id="goodsList" style="display:grid;gap:10px;margin-top:10px"></div>
+      </div>
+
+      <!-- Orders -->
+      <div id="a_orders" style="display:none">
+        <table id="admOrdersTable">
+          <thead><tr><th>#</th><th>Когда</th><th>Клиент</th><th>Состав</th><th>Сумма</th><th>Метод</th><th>Скрин</th><th>Статус</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Topups -->
+      <div id="a_topups" style="display:none">
+        <table id="admTopupsTable">
+          <thead><tr><th>#</th><th>Когда</th><th>Клиент</th><th>Сумма</th><th>Метод</th><th>Скрин</th><th>Статус</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Chat Admin -->
+      <div id="a_chat" style="display:none">
+        <div class="block">
+          <b>Диалог с пользователем</b>
+          <div class="chat" style="margin-top:10px">
+            <div class="log" id="adminChatLog"></div>
+            <div style="display:flex;gap:8px;padding:10px;border-top:1px solid var(--stroke)">
+              <input id="adminChatInput" placeholder="Ответ поддержки...">
+              <button class="btn primary" onclick="Admin.sendSupport()">Ответить</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Admin -->
+      <div id="a_reviews" style="display:none">
+        <button class="btn primary" onclick="Admin.addReview()">+ Отзыв</button>
+        <div id="reviewsListAdm" style="display:grid;gap:10px;margin-top:10px"></div>
+      </div>
+
+      <!-- Look -->
+      <div id="a_look" style="display:none">
+        <label>Заголовок баннера <input id="set_bTitle"></label>
+        <label>Подзаголовок <input id="set_bSub"></label>
+        <label>Картинка баннера <input id="set_bImg" type="file" accept="image/*"></label>
+        <div class="hr"></div>
+        <label>Синий акцент <input id="set_blue" value="#2B7CFF"></label>
+        <div class="hr"></div><button class="btn primary" onclick="Admin.saveLook()">Сохранить</button>
+      </div>
+
+      <!-- Pay -->
+      <div id="a_pay" style="display:none">
+        <label>СБП (банк/получатель/тел/комм.) <textarea id="set_sbp" rows="3"></textarea></label>
+        <label>USDT (TRC20): адрес <input id="set_usdt"></label>
+        <div class="hr"></div><button class="btn primary" onclick="Admin.savePay()">Сохранить</button>
+      </div>
+
+      <!-- Security -->
+      <div id="a_sec" style="display:none">
+        <label>Пароль админки <input id="set_pass" type="password" placeholder="новый пароль"></label>
+        <div class="hr"></div><button class="btn primary" onclick="Admin.savePass()">Обновить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="wrap">© <span id="year"></span> RobuStore • Не аффилирован с Roblox</div></footer>
+
+<script>
+/* ===== Store / bootstrap ===== */
+const LS={k:k=>'rs_'+k,get:(k,d)=>{try{return JSON.parse(localStorage.getItem(LS.k(k)))??d}catch{return d}},set:(k,v)=>localStorage.setItem(LS.k(k),JSON.stringify(v)),now:()=>new Date().toISOString()};
+(function init(){
+  if(!LS.get('settings')){
+    LS.set('settings',{bannerTitle:'RobuStore — выгодный Robux',bannerSubtitle:'Быстро • Надёжно • Без посредников',bannerImg:null,blue:'#2b7cff',
+      pay:{sbp:'СБП: Тинькофф • Получатель: Иванов И.И. • Тел: +7 999 000-00-00 • Комм: ROBUX',usdt:'TXXXXXXXXXXXXXXXXXXXXXXXXXXXX'},adminPass:'root'});
+  }
+  if(!LS.get('products')){
+    LS.set('products',[
+      {id:1,title:'400 Robux',price:399,bonus:0,discount:0,img:null},
+      {id:2,title:'800 Robux',price:749,bonus:40,discount:9,img:null},
+      {id:3,title:'1700 Robux',price:1490,bonus:120,discount:11,img:null},
+      {id:4,title:'4500 Robux',price:3690,bonus:350,discount:13,img:null},
+    ]);
+  }
+  if(!LS.get('orders')) LS.set('orders',[]);
+  if(!LS.get('topups')) LS.set('topups',[]);
+  if(!LS.get('profile')) LS.set('profile',{name:'',balance:0});
+  if(!LS.get('chat')) LS.set('chat',[]);
+  if(!LS.get('reviews')){
+    LS.set('reviews',[
+      {id:1,name:'Oleg Olegovich',date:'16.08.2025',service:'PUBG Mobile',pack:'60 UC',stars:5,tags:['Быстрая поддержка','Надёжность','Приятный интерфейс','Низкая комиссия','Высокая скорость','Простота пополнения','Наличие промокода']},
+      {id:2,name:'Clxwnz Nightmarez',date:'15.08.2025',service:'PUBG Mobile',pack:'2460 UC',stars:5,tags:['Высокая скорость','Простота пополнения','Приятный интерфейс']},
+      {id:3,name:'Vanya Shalimov',date:'12.08.2025',service:'PUBG Mobile',pack:'60 UC',stars:4,tags:['Скорость сервиса']},
+    ]);
+  }
+})();
+
+/* ===== Helpers ===== */
+const fmt = n => new Intl.NumberFormat('ru-RU').format(n);
+
+/* ===== Catalog / Cart ===== */
+const UI={
+  cart:[],
+  mount(){
+    const s=LS.get('settings');
+    document.documentElement.style.setProperty('--blue', s.blue || '#2b7cff');
+    bannerTitle.textContent=s.bannerTitle; bannerSubtitle.textContent=s.bannerSubtitle;
+    if(s.bannerImg) banner.style.backgroundImage=`url(${s.bannerImg})`;
+    // render products
+    grid.innerHTML='';
+    LS.get('products',[]).forEach(p=>{
+      const card=document.createElement('div'); card.className='card col-3';
+      const pic=document.createElement('div'); pic.className='pic'; if(p.img) pic.style.backgroundImage=`url(${p.img})`;
+      const badge=document.createElement('div'); badge.className='badge'; badge.textContent=p.title;
+      const cnt=document.createElement('div'); cnt.className='cnt';
+      const tb=document.createElement('div'); tb.className='titlebar';
+      tb.innerHTML=`<div class="price">${fmt(p.price)} ₽</div><div class="muted s">R$ Robux</div>`;
+      card.appendChild(pic); card.appendChild(badge);
+      if(p.discount) card.insertAdjacentHTML('beforeend',`<div class="discount">-${p.discount}%</div>`);
+      if(p.bonus) card.insertAdjacentHTML('beforeend',`<div class="gift">+${p.bonus}</div>`);
+      card.appendChild(cnt); cnt.appendChild(tb); cnt.insertAdjacentHTML('beforeend','<div class="s muted">Моментальная обработка</div>');
+      const add=document.createElement('button'); add.className='btn primary add'; add.textContent='Купить 🛒'; add.onclick=()=>UI.add(p.id);
+      cnt.appendChild(add);
+      grid.appendChild(card);
+    });
+    UI.updatePill();
+    UI.renderReviews();
+    if(location.hash==='#cabinet') Cab.open();
+    if(location.hash==='#admin') Admin.open();
+    year.textContent=new Date().getFullYear();
+  },
+  add(id){
+    const it=this.cart.find(x=>x.id===id); if(it) it.qty++; else this.cart.push({id,qty:1});
+    this.updatePill();
+  },
+  updatePill(){ cartCount.textContent=this.cart.reduce((a,b)=>a+b.qty,0) },
+  openCart(){ cartDr.classList.add('open'); UI.renderCart(); },
+  closeCart(){ cartDr.classList.remove('open'); },
+  renderCart(){
+    cartItems.innerHTML=''; const prods=LS.get('products',[]); let total=0;
+    this.cart.forEach((i,idx)=>{ const p=prods.find(x=>x.id===i.id); if(!p) return; const sum=p.price*i.qty; total+=sum;
+      const row=document.createElement('div'); row.className='item';
+      row.innerHTML=`<div><b>${p.title}</b><div class="s muted">${fmt(p.price)} ₽ × ${i.qty}</div></div>`;
+      const q=document.createElement('div'); q.className='qty';
+      const m=document.createElement('button'); m.className='btn xs'; m.textContent='–';
+      const pl=document.createElement('button'); pl.className='btn xs'; pl.textContent='+';
+      m.onclick=()=>{i.qty--; if(i.qty<=0) UI.cart.splice(idx,1); UI.renderCart(); UI.updatePill();};
+      pl.onclick=()=>{i.qty++; UI.renderCart(); UI.updatePill();};
+      q.append(m,pl); row.appendChild(q); cartItems.appendChild(row);
+    });
+    cartTotal.textContent=fmt(total)+' ₽';
+    cabBalanceInline.textContent=fmt(LS.get('profile').balance)+' ₽';
+    // tabs switch
+    document.querySelectorAll('#payBlock .tab').forEach(t=>{
+      t.onclick=()=>{
+        document.querySelectorAll('#payBlock .tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+        pay_frombalance.style.display = t.dataset.paytab==='frombalance'?'block':'none';
+        pay_manual.style.display = t.dataset.paytab==='manual'?'block':'none';
+      };
+    });
+    // requisites
+    UI.renderReq('SBP');
+    document.querySelectorAll('input[name=pm]').forEach(r=>r.onchange=()=>UI.renderReq(r.value));
+  },
+  renderReq(type){
+    const s=LS.get('settings'); requisitesBox.innerHTML = type==='SBP'
+      ? `<b>🏦 СБП</b><div class="s muted">${s.pay.sbp||'Заполните в админке'}</div>`
+      : `<b>🪙 USDT (TRC20)</b><div class="s muted">${s.pay.usdt||'Заполните в админке'}</div>`;
+  },
+  sum(){ const prods=LS.get('products',[]); return this.cart.reduce((a,i)=>{const p=prods.find(x=>x.id===i.id); return a+(p?p.price*i.qty:0)},0) },
+  payFromBalance(){
+    const sum=this.sum(); const prof=LS.get('profile');
+    if(sum<=0) return alert('Корзина пуста');
+    if(prof.balance<sum) return alert('Недостаточно средств');
+    const order={ id:Date.now(), created:LS.now(), name:prof.name||'Не указан', pm:'Баланс', sum, items:this.cart.map(i=>({id:i.id,qty:i.qty})), screenshot:null, status:'Оплачено' };
+    const orders=LS.get('orders',[]); orders.unshift(order); LS.set('orders',orders);
+    prof.balance-=sum; LS.set('profile',prof);
+    this.cart=[]; this.updatePill(); this.renderCart(); Cab.renderAll();
+    alert('Оплачено с баланса. Заказ создан.');
+  },
+  submitOrder(){
+    const name=ck_name.value.trim()||LS.get('profile').name||'Не указан';
+    const pm=document.querySelector('input[name=pm]:checked').value;
+    const file=ck_file.files[0];
+    const sum=this.sum(); if(sum<=0) return alert('Корзина пуста');
+    const finalize=(img)=>{
+      const order={ id:Date.now(), created:LS.now(), name, pm, sum, items:UI.cart.map(i=>({id:i.id,qty:i.qty})), screenshot:img||null, status:'На обработке' };
+      const orders=LS.get('orders',[]); orders.unshift(order); LS.set('orders',orders);
+      UI.cart=[]; UI.updatePill(); UI.renderCart(); ck_done.style.display='block'; Cab.renderAll();
+    };
+    if(file){ const fr=new FileReader(); fr.onload=()=>finalize(fr.result); fr.readAsDataURL(file); }
+    else finalize(null);
+  },
+
+  /* Reviews */
+  renderReviews(){
+    const list=document.getElementById('revList'); list.innerHTML='';
+    const data=LS.get('reviews',[]);
+    let total=0;
+    data.forEach(r=>{
+      total+=r.stars;
+      const card=document.createElement('div'); card.className='rev-card';
+      const tags = (r.tags||[]).map(t=>`<span class="tag">⚙️ ${t}</span>`).join(' ');
+      const stars='★'.repeat(r.stars)+'☆'.repeat(5-r.stars);
+      card.innerHTML=`
+        <div class="rev-head">
+          <div class="rev-user">
+            <div class="rev-ava">${r.name.charAt(0).toUpperCase()}</div>
+            <div>
+              <b>${r.name}</b>
+              <div class="s muted">${r.service} • ${r.pack} • <span>${r.date}</span></div>
+            </div>
+          </div>
+          <div class="stars">${stars}</div>
+        </div>
+        <div class="rev-tags">${tags}</div>
+      `;
+      list.appendChild(card);
+    });
+    // Stats
+    const avg = data.length ? (total/data.length).toFixed(2) : '0.00';
+    revAvg.textContent=avg; revCount.textContent=data.length;
+    const brk=[0,0,0,0,0]; data.forEach(r=>brk[r.stars-1]++); 
+    revStarsBreak.innerHTML = [5,4,3,2,1].map(s=>{
+      const count = brk[s-1]||0; return `${'★'.repeat(s)}${'☆'.repeat(5-s)} — ${count}`;
+    }).join('<br>');
+  }
+};
+
+/* ===== Cabinet ===== */
+const Cab={
+  open(){ cabDr.classList.add('open'); Cab.renderAll(); },
+  close(){ cabDr.classList.remove('open'); },
+  renderAll(){
+    const prof=LS.get('profile'); uName.innerHTML=`<b>${prof.name||'Гость'}</b>`;
+    uAva.textContent=(prof.name||'U').trim().charAt(0).toUpperCase()||'U';
+    balanceVal.textContent=fmt(prof.balance)+' ₽';
+    ordersCount.textContent=LS.get('orders',[]).length;
+    topupsCount.textContent=LS.get('topups',[]).length;
+    prof_name.value=prof.name||'';
+    Cab.renderOrders(); Cab.renderTopups(); Chat.render();
+    document.querySelectorAll('.mitem').forEach(b=>b.onclick=()=>{
+      document.querySelectorAll('.mitem').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+      ['overview','orders','topups','chat','settings'].forEach(k=>document.getElementById('c_'+k).style.display='none');
+      document.getElementById('c_'+b.dataset.ctab).style.display='block';
+    });
+    document.querySelectorAll('#c_topups .tab').forEach(t=>t.onclick=()=>{
+      document.querySelectorAll('#c_topups .tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+      topup_new.style.display = t.dataset.topupt==='new'?'block':'none';
+      topup_hist.style.display = t.dataset.topupt==='hist'?'block':'none';
+    });
+    Cab.renderTopupReq(document.querySelector('input[name=tp_pm]:checked').value);
+    document.querySelectorAll('input[name=tp_pm]').forEach(r=>r.onchange=()=>Cab.renderTopupReq(r.value));
+  },
+  renderOrders(){
+    const tbody=document.querySelector('#ordersTable tbody'); tbody.innerHTML='';
+    const prods=LS.get('products',[]); LS.get('orders',[]).forEach(o=>{
+      const items=o.items.map(it=>{const p=prods.find(x=>x.id===it.id);return (p?p.title:'?')+' ×'+it.qty}).join(', ');
+      const st=o.status==='Оплачено'||o.status==='Выполнено'?`<span class="status s-done">${o.status}</span>`:o.status==='Отменено'?`<span class="status s-cancel">${o.status}</span>`:`<span class="status s-pend">${o.status}</span>`;
+      const tr=document.createElement('tr'); tr.innerHTML=`<td>${o.id}</td><td>${new Date(o.created).toLocaleString('ru-RU')}</td><td>${items}</td><td>${fmt(o.sum)} ₽</td><td>${o.pm}</td><td>${st}</td>`;
+      tbody.appendChild(tr);
+    });
+  },
+  renderTopups(){
+    const tbody=document.querySelector('#topupsTable tbody'); tbody.innerHTML='';
+    LS.get('topups',[]).forEach(t=>{
+      const st=t.status==='Зачислено'?`<span class="status s-done">${t.status}</span>`:t.status==='Отклонено'?`<span class="status s-cancel">${t.status}</span>`:`<span class="status s-pend">${t.status}</span>`;
+      const tr=document.createElement('tr'); tr.innerHTML=`<td>${t.id}</td><td>${new Date(t.created).toLocaleString('ru-RU')}</td><td>${fmt(t.amount)} ₽</td><td>${t.pm}</td><td>${st}</td>`;
+      tbody.appendChild(tr);
+    });
+  },
+  renderTopupReq(type){
+    const s=LS.get('settings');
+    tp_req.innerHTML = type==='SBP'?`<b>🏦 СБП</b><div class="s muted">${s.pay.sbp||'Заполните в админке'}</div>`:`<b>🪙 USDT (TRC20)</b><div class="s muted">${s.pay.usdt||'Заполните в админке'}</div>`;
+  },
+  submitTopup(){
+    const amount=+tp_amount.value||0; if(amount<=0) return alert('Введите сумму');
+    const pm=document.querySelector('input[name=tp_pm]:checked').value;
+    const file=tp_file.files[0];
+    const finalize=(img)=>{
+      const t={id:Date.now(),created:LS.now(),pm,amount,screenshot:img||null,status:'На обработке',name:LS.get('profile').name||'Не указан'};
+      const arr=LS.get('topups',[]); arr.unshift(t); LS.set('topups',arr);
+      tp_done.style.display='block'; Cab.renderTopups();
+    };
+    if(file){ const fr=new FileReader(); fr.onload=()=>finalize(fr.result); fr.readAsDataURL(file); } else finalize(null);
+  },
+  saveProfile(){
+    const p=LS.get('profile'); p.name=prof_name.value.trim(); LS.set('profile',p); alert('Сохранено'); Cab.renderAll();
+  }
+};
+
+/* ===== Chat ===== */
+const Chat={
+  render(){
+    const log=document.getElementById('chatLog'); if(!log) return;
+    log.innerHTML=''; const msgs=LS.get('chat',[]);
+    msgs.forEach(m=>log.appendChild(Chat.msgEl(m)));
+    log.scrollTop=log.scrollHeight;
+  },
+  msgEl(m){
+    const row=document.createElement('div'); row.className='msg '+(m.from==='user'?'user':'support');
+    const av=document.createElement('div'); av.className='avatar '+(m.from==='support'?'support':''); av.textContent=m.from==='support'?'S':(LS.get('profile').name||'U').charAt(0).toUpperCase();
+    const bubble=document.createElement('div'); bubble.className='bubble'; bubble.innerHTML = m.text.replace(/</g,'&lt;');
+    row.appendChild(av); row.appendChild(bubble); return row;
+  },
+  send(){
+    const inp=document.getElementById('chatInput'); const txt=(inp.value||'').trim(); if(!txt) return;
+    const arr=LS.get('chat',[]); arr.push({id:Date.now(),from:'user',text:txt,created:LS.now()}); LS.set('chat',arr);
+    inp.value=''; Chat.render(); Admin.renderChat();
+  }
+};
+
+/* ===== Admin ===== */
+const Admin={
+  open(){ admDr.classList.add('open'); },
+  close(){ admDr.classList.remove('open'); },
+  login(){
+    if(admPass.value===LS.get('settings').adminPass){
+      admLogin.style.display='none'; admApp.style.display='block'; Admin.render();
+    }else alert('Неверный пароль');
+  },
+  render(){
+    document.querySelectorAll('#admDr .tab').forEach(t=>t.onclick=()=>{
+      document.querySelectorAll('#admDr .tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+      a_goods.style.display = t.dataset.atab==='goods'?'block':'none';
+      a_orders.style.display = t.dataset.atab==='orders'?'block':'none';
+      a_topups.style.display = t.dataset.atab==='topups'?'block':'none';
+      a_chat.style.display   = t.dataset.atab==='chat'?'block':'none';
+      a_reviews.style.display= t.dataset.atab==='reviews'?'block':'none';
+      a_look.style.display   = t.dataset.atab==='look'?'block':'none';
+      a_pay.style.display    = t.dataset.atab==='pay'?'block':'none';
+      a_sec.style.display    = t.dataset.atab==='sec'?'block':'none';
+    });
+    const s=LS.get('settings');
+    set_bTitle.value=s.bannerTitle; set_bSub.value=s.bannerSubtitle; set_blue.value=s.blue||'#2B7CFF';
+    set_sbp.value=s.pay.sbp; set_usdt.value=s.pay.usdt;
+    Admin.renderGoods(); Admin.renderOrders(); Admin.renderTopups(); Admin.renderChat(); Admin.renderReviewsAdm();
+  },
+  /* Goods */
+  renderGoods(){
+    goodsList.innerHTML='';
+    LS.get('products',[]).forEach(p=>{
+      const row=document.createElement('div'); row.className='item'; row.style.alignItems='flex-start';
+      row.innerHTML=`
+        <div style="flex:1">
+          <label>Название <input data-id="${p.id}" data-k="title" value="${p.title}"></label>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px">
+            <label>Цена ₽ <input type="number" data-id="${p.id}" data-k="price" value="${p.price}"></label>
+            <label>Бонус <input type="number" data-id="${p.id}" data-k="bonus" value="${p.bonus}"></label>
+            <label>Скидка % <input type="number" data-id="${p.id}" data-k="discount" value="${p.discount}"></label>
+          </div>
+          <div style="margin-top:6px"><label>Фото <input type="file" accept="image/*" data-id="${p.id}" data-k="img"></label></div>
+        </div>
+        <div>
+          <button class="btn primary" onclick="Admin.saveProduct(${p.id})">Сохранить</button>
+          <div style="height:6px"></div>
+          <button class="btn" onclick="Admin.delProduct(${p.id})">Удалить</button>
+        </div>`;
+      goodsList.appendChild(row);
+    });
+  },
+  addProduct(){
+    const arr=LS.get('products',[]); const id=(arr.at(-1)?.id||0)+1;
+    arr.push({id,title:'Новый пакет',price:100,bonus:0,discount:0,img:null});
+    LS.set('products',arr); Admin.renderGoods(); UI.mount();
+  },
+  saveProduct(id){
+    const arr=LS.get('products',[]); const p=arr.find(x=>x.id===id); if(!p) return;
+    document.querySelectorAll(`[data-id="${id}"]`).forEach(el=>{
+      const k=el.dataset.k;
+      if(k==='img' && el.files[0]){ const fr=new FileReader(); fr.onload=()=>{p.img=fr.result; LS.set('products',arr); UI.mount();}; fr.readAsDataURL(el.files[0]); }
+      else p[k]=(el.type==='number')?+el.value:el.value;
+    });
+    LS.set('products',arr); UI.mount();
+  },
+  delProduct(id){ const arr=LS.get('products',[]).filter(x=>x.id!==id); LS.set('products',arr); Admin.renderGoods(); UI.mount(); },
+
+  /* Orders */
+  renderOrders(){
+    const tb=document.querySelector('#admOrdersTable tbody'); tb.innerHTML='';
+    const prods=LS.get('products',[]);
+    LS.get('orders',[]).forEach(o=>{
+      const items=o.items.map(it=>{const p=prods.find(x=>x.id===it.id);return (p?p.title:'?')+' ×'+it.qty}).join(', ');
+      const img=o.screenshot?`<a href="${o.screenshot}" target="_blank">Открыть</a>`:'—';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${o.id}</td><td>${new Date(o.created).toLocaleString('ru-RU')}</td><td>${o.name}</td><td>${items}</td><td>${fmt(o.sum)} ₽</td><td>${o.pm}</td><td>${img}</td>
+      <td><select data-oid="${o.id}">
+        ${['На обработке','Оплачено','Выполнено','Отменено'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}
+      </select></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('select').forEach(sel=>sel.onchange=()=>{
+      const arr=LS.get('orders',[]); const o=arr.find(x=>x.id==sel.dataset.oid); o.status=sel.value; LS.set('orders',arr); Cab.renderOrders();
+    });
+  },
+
+  /* Topups */
+  renderTopups(){
+    const tb=document.querySelector('#admTopupsTable tbody'); tb.innerHTML='';
+    LS.get('topups',[]).forEach(t=>{
+      const img=t.screenshot?`<a href="${t.screenshot}" target="_blank">Открыть</a>`:'—';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${t.id}</td><td>${new Date(t.created).toLocaleString('ru-RU')}</td><td>${t.name||'—'}</td><td>${fmt(t.amount)} ₽</td><td>${t.pm}</td><td>${img}</td>
+      <td><select data-tid="${t.id}">
+        ${['На обработке','Зачислено','Отклонено'].map(s=>`<option ${t.status===s?'selected':''}>${s}</option>`).join('')}
+      </select></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('select').forEach(sel=>sel.onchange=()=>{
+      const arr=LS.get('topups',[]); const t=arr.find(x=>x.id==sel.dataset.tid); if(!t) return;
+      const prev=t.status; t.status=sel.value; LS.set('topups',arr);
+      if(sel.value==='Зачислено' && prev!=='Зачислено'){ const p=LS.get('profile'); p.balance+=t.amount; LS.set('profile',p); }
+      Cab.renderAll();
+    });
+  },
+
+  /* Chat */
+  renderChat(){
+    const log=document.getElementById('adminChatLog'); if(!log) return;
+    log.innerHTML=''; const msgs=LS.get('chat',[]); msgs.forEach(m=>log.appendChild(Chat.msgEl(m)));
+    log.scrollTop=log.scrollHeight;
+  },
+  sendSupport(){
+    const inp=document.getElementById('adminChatInput'); const txt=(inp.value||'').trim(); if(!txt) return;
+    const arr=LS.get('chat',[]); arr.push({id:Date.now(),from:'support',text:txt,created:LS.now()}); LS.set('chat',arr);
+    inp.value=''; Admin.renderChat(); Chat.render();
+  },
+
+  /* Reviews admin */
+  renderReviewsAdm(){
+    const box=document.getElementById('reviewsListAdm'); box.innerHTML='';
+    LS.get('reviews',[]).forEach(r=>{
+      const row=document.createElement('div'); row.className='item'; row.style.alignItems='flex-start';
+      row.innerHTML=`
+        <div style="flex:1">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+            <label>Имя <input data-rid="${r.id}" data-k="name" value="${r.name}"></label>
+            <label>Дата <input data-rid="${r.id}" data-k="date" value="${r.date}"></label>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:6px">
+            <label>Сервис <input data-rid="${r.id}" data-k="service" value="${r.service}"></label>
+            <label>Пакет <input data-rid="${r.id}" data-k="pack" value="${r.pack}"></label>
+          </div>
+          <div style="margin-top:6px;display:flex;gap:8px;align-items:center">
+            <label style="flex:0 0 160px">Звёзды (1–5) <input type="number" min="1" max="5" data-rid="${r.id}" data-k="stars" value="${r.stars}"></label>
+            <label style="flex:1">Теги через запятую <input data-rid="${r.id}" data-k="tags" value="${(r.tags||[]).join(', ')}"></label>
+          </div>
+        </div>
+        <div>
+          <button class="btn primary" onclick="Admin.saveReview(${r.id})">Сохранить</button>
+          <div style="height:6px"></div>
+          <button class="btn" onclick="Admin.delReview(${r.id})">Удалить</button>
+        </div>`;
+      box.appendChild(row);
+    });
+  },
+  addReview(){
+    const arr=LS.get('reviews',[]); const id=(arr.at(-1)?.id||0)+1;
+    arr.push({id,name:'Новый пользователь',date:new Date().toLocaleDateString('ru-RU'),service:'Roblox',pack:'R$',stars:5,tags:['Быстро','Удобно']});
+    LS.set('reviews',arr); Admin.renderReviewsAdm(); UI.renderReviews();
+  },
+  saveReview(id){
+    const arr=LS.get('reviews',[]); const r=arr.find(x=>x.id===id); if(!r) return;
+    document.querySelectorAll(`[data-rid="${id}"]`).forEach(el=>{
+      const k=el.dataset.k;
+      if(k==='stars') r[k]=Math.max(1,Math.min(5,+el.value||5));
+      else if(k==='tags') r[k]=el.value.split(',').map(s=>s.trim()).filter(Boolean);
+      else r[k]=el.value;
+    });
+    LS.set('reviews',arr); UI.renderReviews();
+  },
+  delReview(id){ const arr=LS.get('reviews',[]).filter(x=>x.id!==id); LS.set('reviews',arr); Admin.renderReviewsAdm(); UI.renderReviews(); },
+
+  /* Look/Pay/Sec */
+  saveLook(){
+    const s=LS.get('settings');
+    s.bannerTitle=set_bTitle.value; s.bannerSubtitle=set_bSub.value; s.blue=set_blue.value||s.blue;
+    const f=set_bImg.files[0]; if(f){ const fr=new FileReader(); fr.onload=()=>{s.bannerImg=fr.result; LS.set('settings',s); UI.mount();}; fr.readAsDataURL(f); }
+    LS.set('settings',s); UI.mount(); alert('Сохранено');
+  },
+  savePay(){ const s=LS.get('settings'); s.pay.sbp=set_sbp.value; s.pay.usdt=set_usdt.value; LS.set('settings',s); alert('Реквизиты сохранены'); },
+  savePass(){ const s=LS.get('settings'); const np=set_pass.value.trim(); if(np.length<3) return alert('Мин. 3 символа'); s.adminPass=np; LS.set('settings',s); alert('Пароль обновлён'); }
+};
+
+/* ===== Events / Mount ===== */
+openCart.onclick=UI.openCart;
+document.querySelector('a[href="#cabinet"]').onclick=(e)=>{e.preventDefault(); Cab.open();};
+document.getElementById('logo').onclick=()=>location.hash='#home';
+window.addEventListener('hashchange',()=>{ if(location.hash==='#cabinet') Cab.open(); if(location.hash==='#admin') Admin.open(); });
+document.addEventListener('keydown',e=>{ if(e.ctrlKey&&e.altKey&&e.key.toLowerCase()==='a'){ e.preventDefault(); Admin.open(); }});
+
+UI.mount();
+</script>
+</body>
+</html>
